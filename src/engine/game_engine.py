@@ -1,3 +1,4 @@
+import asyncio
 import json
 import pygame
 import esper
@@ -18,14 +19,17 @@ from src.ecs.systems.s_player_state import system_player_state
 from src.ecs.systems.s_explosion_kill import system_explosion_kill
 from src.ecs.systems.s_enemy_hunter_state import system_enemy_hunter_state
 
+from src.ecs.systems.s_charge_shield import system_charge_shield
+
 from src.ecs.components.c_velocity import CVelocity
 from src.ecs.components.c_transform import CTransform
 from src.ecs.components.c_surface import CSurface
+from src.ecs.components.c_charge_shield import CChargeShield
 from src.ecs.components.tags.c_tag_bullet import CTagBullet
 
 from src.ecs.components.c_input_command import CInputCommand, CommandPhase
 
-from src.create.prefab_creator import create_enemy_spawner, create_input_player, create_player_square, create_bullet
+from src.create.prefab_creator import create_enemy_spawner, create_input_player, create_player_square, create_bullet, create_pause_text, create_interface, create_shield, create_special_shield_interface
 
 
 class GameEngine:
@@ -49,6 +53,8 @@ class GameEngine:
 
         self.num_bullets = 0
 
+        self.paused = False
+
     def _load_config_files(self):
         with open("assets/cfg/window.json", encoding="utf-8") as window_file:
             self.window_cfg = json.load(window_file)
@@ -62,8 +68,10 @@ class GameEngine:
             self.bullet_cfg = json.load(bullet_file)
         with open("assets/cfg/explosion.json") as explosion_file:
             self.explosion_cfg = json.load(explosion_file)
+        with open("assets/cfg/interface.json") as interface_file:
+            self.interface_cfg = json.load(interface_file)
 
-    def run(self) -> None:
+    async def run(self) -> None:
         self._create()
         self.is_running = True
         while self.is_running:
@@ -71,16 +79,26 @@ class GameEngine:
             self._process_events()
             self._update()
             self._draw()
+            await asyncio.sleep(0)
         self._clean()
 
     def _create(self):
-        self._player_entity = create_player_square(self.ecs_world, self.player_cfg, self.level_01_cfg["player_spawn"])
-        self._player_c_v = self.ecs_world.component_for_entity(self._player_entity, CVelocity)
-        self._player_c_t = self.ecs_world.component_for_entity(self._player_entity, CTransform)
-        self._player_c_s = self.ecs_world.component_for_entity(self._player_entity, CSurface)
+        self._player_entity = create_player_square(
+            self.ecs_world, self.player_cfg, self.level_01_cfg["player_spawn"])
+        self._player_c_v = self.ecs_world.component_for_entity(
+            self._player_entity, CVelocity)
+        self._player_c_t = self.ecs_world.component_for_entity(
+            self._player_entity, CTransform)
+        self._player_c_s = self.ecs_world.component_for_entity(
+            self._player_entity, CSurface)
 
         create_enemy_spawner(self.ecs_world, self.level_01_cfg)
         create_input_player(self.ecs_world)
+        create_interface(self.ecs_world, self.interface_cfg)
+        charge_text_entity = create_special_shield_interface(
+            self.ecs_world, self.interface_cfg, self.player_cfg)
+        self._charged_shield = self.ecs_world.component_for_entity(
+            charge_text_entity, CChargeShield)
 
     def _calculate_time(self):
         self.clock.tick(self.framerate)
@@ -93,6 +111,8 @@ class GameEngine:
                 self.is_running = False
 
     def _update(self):
+        if self.paused:
+            return
         system_enemy_spawner(self.ecs_world, self.enemies_cfg, self.delta_time)
         system_movement(self.ecs_world, self.delta_time)
 
@@ -107,7 +127,11 @@ class GameEngine:
         system_explosion_kill(self.ecs_world)
 
         system_player_state(self.ecs_world)
-        system_enemy_hunter_state(self.ecs_world, self._player_entity, self.enemies_cfg["TypeHunter"])
+        system_enemy_hunter_state(
+            self.ecs_world, self._player_entity, self.enemies_cfg["TypeHunter"])
+
+        system_charge_shield(
+            self.ecs_world, self.delta_time, self.interface_cfg)
 
         system_animation(self.ecs_world, self.delta_time)
 
@@ -124,6 +148,14 @@ class GameEngine:
         pygame.quit()
 
     def _do_action(self, c_input: CInputCommand):
+        if c_input.name == "PAUSE_GAME" and c_input.phase == CommandPhase.START:
+            self.paused = not self.paused
+            if self.paused:
+                self.paused_text = create_pause_text(
+                    self.ecs_world, self.interface_cfg)
+            else:
+                self.ecs_world.delete_entity(self.paused_text)
+
         if c_input.name == "PLAYER_LEFT":
             if c_input.phase == CommandPhase.START:
                 self._player_c_v.vel.x -= self.player_cfg["input_velocity"]
@@ -145,6 +177,15 @@ class GameEngine:
             elif c_input.phase == CommandPhase.END:
                 self._player_c_v.vel.y -= self.player_cfg["input_velocity"]
 
+        if self.paused:
+            return
+        
         if c_input.name == "PLAYER_FIRE" and self.num_bullets < self.level_01_cfg["player_spawn"]["max_bullets"]:
             create_bullet(self.ecs_world, c_input.mouse_pos, self._player_c_t.pos,
                           self._player_c_s.area.size, self.bullet_cfg)
+
+        if c_input.name == "PLAYER_ACTIVE_SHIELD" and c_input.phase == CommandPhase.START \
+                and self._charged_shield.charged:
+            self._charged_shield.charged = False
+            self._charged_shield.curr_charge_time = 0
+            create_shield(self.ecs_world, self._player_c_t.pos, self.player_cfg)

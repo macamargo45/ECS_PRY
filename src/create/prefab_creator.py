@@ -1,6 +1,7 @@
 import random
 import pygame
 import esper
+from src.ecs.components.c_charge_shield import CChargeShield
 
 from src.ecs.components.c_enemy_spawner import CEnemySpawner
 from src.ecs.components.c_input_command import CInputCommand
@@ -14,6 +15,7 @@ from src.ecs.components.tags.c_tag_explosion import CTagExplosion
 from src.ecs.components.c_animation import CAnimation
 from src.ecs.components.c_player_state import CPlayerState
 from src.ecs.components.c_enemy_hunter_state import CEnemyHunterState
+from src.ecs.components.tags.c_tag_shield import CTagShield
 from src.engine.service_locator import ServiceLocator
 
 
@@ -99,9 +101,17 @@ def create_input_player(world: esper.World):
     world.add_component(input_down,
                         CInputCommand("PLAYER_DOWN", pygame.K_DOWN))
 
+    pause_game = world.create_entity()
+    world.add_component(pause_game,
+                        CInputCommand("PAUSE_GAME", pygame.K_p))
+
     input_fire = world.create_entity()
     world.add_component(input_fire,
                         CInputCommand("PLAYER_FIRE", pygame.BUTTON_LEFT))
+    
+    input_active_shield = world.create_entity()
+    world.add_component(input_active_shield,
+                        CInputCommand("PLAYER_ACTIVE_SHIELD", pygame.BUTTON_RIGHT))
 
 
 def create_bullet(world: esper.World,
@@ -122,7 +132,8 @@ def create_bullet(world: esper.World,
 
 
 def create_explosion(world: esper.World, pos: pygame.Vector2, explosion_info: dict):
-    explosion_surface = ServiceLocator.images_service.get(explosion_info["image"])
+    explosion_surface = ServiceLocator.images_service.get(
+        explosion_info["image"])
     vel = pygame.Vector2(0, 0)
 
     explosion_entity = create_sprite(world, pos, vel, explosion_surface)
@@ -131,3 +142,77 @@ def create_explosion(world: esper.World, pos: pygame.Vector2, explosion_info: di
                         CAnimation(explosion_info["animations"]))
     ServiceLocator.sounds_service.play(explosion_info["sound"])
     return explosion_entity
+
+
+def create_interface(world: esper.World, interface_info: dict):
+    text = interface_info["title"]["text"]
+    font = ServiceLocator.texts_service.get(interface_info["title"]["font"],
+                                            interface_info["title"]["size"])
+    color = pygame.Color(interface_info["title"]["color"]["r"],
+                         interface_info["title"]["color"]["g"],
+                         interface_info["title"]["color"]["b"])
+    pos = pygame.Vector2(interface_info["title"]["position"]["x"],
+                         interface_info["title"]["position"]["y"])
+    create_text(world, text, font, color, pos)
+
+    text_desc = interface_info["description"]["text"]
+    font_desc = ServiceLocator.texts_service.get(interface_info["description"]["font"],
+                                                 interface_info["description"]["size"])
+    color_desc = pygame.Color(interface_info["description"]["color"]["r"],
+                              interface_info["description"]["color"]["g"],
+                              interface_info["description"]["color"]["b"])
+    pos_desc = pygame.Vector2(interface_info["description"]["position"]["x"],
+                              interface_info["description"]["position"]["y"])
+    create_text(world, text_desc, font_desc, color_desc, pos_desc)
+
+
+def create_text(world: esper.World, text: str, font: pygame.font.Font, color: pygame.Color, pos: pygame.Vector2):
+    text_entity = world.create_entity()
+    world.add_component(text_entity,
+                        CTransform(pos))
+    world.add_component(text_entity,
+                        CSurface.from_text(text, font, color))
+    return text_entity
+
+
+def create_pause_text(world: esper.World, interface_info: dict):
+    font = ServiceLocator.texts_service.get(interface_info["pauseText"]["font"],
+                                            interface_info["pauseText"]["size"])
+    color = pygame.Color(interface_info["pauseText"]["color"]["r"],
+                         interface_info["pauseText"]["color"]["g"],
+                         interface_info["pauseText"]["color"]["b"])
+    text = interface_info["pauseText"]["text"]
+    pos = pygame.Vector2(280, 180)
+    txt_ent = create_text(
+        world, text, font, color, pos)
+    return txt_ent
+
+
+def create_special_shield_interface(world: esper.World, interface_info: dict, player_info: dict) -> int:
+    text_desc_special = interface_info["shield"]["text"]
+    font_desc_special = ServiceLocator.texts_service.get(interface_info["shield"]["font"],
+                                                         interface_info["shield"]["size"])
+    color_desc_special = pygame.Color(interface_info["shield"]["color"]["r"],
+                                      interface_info["shield"]["color"]["g"],
+                                      interface_info["shield"]["color"]["b"])
+    pos_desc_special = pygame.Vector2(interface_info["shield"]["position"]["x"],
+                                      interface_info["shield"]["position"]["y"])
+    create_text(world, text_desc_special, font_desc_special,
+                color_desc_special, pos_desc_special)
+
+    charge_special_font = ServiceLocator.texts_service.get(
+        interface_info["shieldPercentage"]["font"], interface_info["shieldPercentage"]["size"])
+    charge_special_color = pygame.Color(0, 255, 0)
+    charge_special_pos = pos_desc_special.copy() + pygame.Vector2(0, 15)
+    charge_special_text = "100%"
+    bullet_charge_text = create_text(
+        world, charge_special_text, charge_special_font, charge_special_color, charge_special_pos)
+    world.add_component(bullet_charge_text,
+                        CChargeShield(player_info["charge_time_special"]))
+    return bullet_charge_text
+
+def create_shield(world: esper.World, playerPos: pygame.Vector2, player_info: dict) -> int:
+    shield_surface = ServiceLocator.images_service.get(player_info["image_special"])
+    shield_entity = create_sprite(world, playerPos, pygame.Vector2(0, 0), shield_surface)
+    world.add_component(shield_entity, CTagShield())
+    world.add_component(shield_entity, CAnimation(player_info["shield_animations"]))
