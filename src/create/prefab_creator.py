@@ -50,6 +50,7 @@ def create_enemy_square(world: esper.World, pos: pygame.Vector2, enemy_info: dic
                               random.choice([-vel_range, vel_range]))
     enemy_entity = create_sprite(world, pos, velocity, enemy_surface)
     world.add_component(enemy_entity, CTagEnemy("Bouncer"))
+    ServiceLocator.sounds_service.play(enemy_info["sound"])
 
 
 def create_enemy_hunter(world: esper.World, pos: pygame.Vector2, enemy_info: dict):
@@ -117,6 +118,7 @@ def create_bullet(world: esper.World,
 
     bullet_entity = create_sprite(world, pos, vel, bullet_surface)
     world.add_component(bullet_entity, CTagBullet())
+    ServiceLocator.sounds_service.play(bullet_info["sound"])
 
 
 def create_explosion(world: esper.World, pos: pygame.Vector2, explosion_info: dict):
@@ -127,4 +129,5 @@ def create_explosion(world: esper.World, pos: pygame.Vector2, explosion_info: di
     world.add_component(explosion_entity, CTagExplosion())
     world.add_component(explosion_entity,
                         CAnimation(explosion_info["animations"]))
+    ServiceLocator.sounds_service.play(explosion_info["sound"])
     return explosion_entity
