@@ -19,17 +19,14 @@ from src.ecs.systems.s_player_state import system_player_state
 from src.ecs.systems.s_explosion_kill import system_explosion_kill
 from src.ecs.systems.s_enemy_hunter_state import system_enemy_hunter_state
 
-from src.ecs.systems.s_charge_shield import system_charge_shield
-
 from src.ecs.components.c_velocity import CVelocity
 from src.ecs.components.c_transform import CTransform
 from src.ecs.components.c_surface import CSurface
-from src.ecs.components.c_charge_shield import CChargeShield
 from src.ecs.components.tags.c_tag_bullet import CTagBullet
 
 from src.ecs.components.c_input_command import CInputCommand, CommandPhase
 
-from src.create.prefab_creator import create_enemy_spawner, create_input_player, create_player_square, create_bullet, create_pause_text, create_interface, create_shield, create_special_shield_interface
+from src.create.prefab_creator import create_enemy_spawner, create_input_player, create_player_square, create_bullet, create_pause_text, create_interface
 
 
 class GameEngine:
@@ -95,10 +92,6 @@ class GameEngine:
         create_enemy_spawner(self.ecs_world, self.level_01_cfg)
         create_input_player(self.ecs_world)
         create_interface(self.ecs_world, self.interface_cfg)
-        charge_text_entity = create_special_shield_interface(
-            self.ecs_world, self.interface_cfg, self.player_cfg)
-        self._charged_shield = self.ecs_world.component_for_entity(
-            charge_text_entity, CChargeShield)
 
     def _calculate_time(self):
         self.clock.tick(self.framerate)
@@ -129,9 +122,6 @@ class GameEngine:
         system_player_state(self.ecs_world)
         system_enemy_hunter_state(
             self.ecs_world, self._player_entity, self.enemies_cfg["TypeHunter"])
-
-        system_charge_shield(
-            self.ecs_world, self.delta_time, self.interface_cfg)
 
         system_animation(self.ecs_world, self.delta_time)
 
@@ -183,9 +173,3 @@ class GameEngine:
         if c_input.name == "PLAYER_FIRE" and self.num_bullets < self.level_01_cfg["player_spawn"]["max_bullets"]:
             create_bullet(self.ecs_world, c_input.mouse_pos, self._player_c_t.pos,
                           self._player_c_s.area.size, self.bullet_cfg)
-
-        if c_input.name == "PLAYER_ACTIVE_SHIELD" and c_input.phase == CommandPhase.START \
-                and self._charged_shield.charged:
-            self._charged_shield.charged = False
-            self._charged_shield.curr_charge_time = 0
-            create_shield(self.ecs_world, self._player_c_t.pos, self.player_cfg)
