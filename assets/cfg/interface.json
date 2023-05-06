@@ -1,67 +1,18 @@
 {
-  "title": {
-    "text": "Space Invaders",
-    "font": "assets/fnt/PressStart2P.ttf",
-    "size": 12,
-    "color": {
-      "r": 255,
-      "g": 255,
-      "b": 255
+    "title_text_color": {
+        "r": 255,
+        "g": 0,
+        "b": 0
     },
-    "position": {
-      "x": 25,
-      "y": 25
-  }
-  },
-  "description": {
-    "text": "A simple space invaders game",
-    "font": "assets/fnt/PressStart2P.ttf",
-    "size": 8,
-    "color": {
-      "r": 255,
-      "g": 255,
-      "b": 0
+    "normal_text_color": {
+        "r": 255,
+        "g": 255,
+        "b": 255
     },
-    "position": {
-      "x": 25,
-      "y": 50
-    }
-  },
-  "pauseText": {
-    "text": "PAUSED",
-    "font": "assets/fnt/PressStart2P.ttf",
-    "size": 16,
-    "color": {
-      "r": 255,
-      "g": 255,
-      "b": 255
-    }
-  },
-  "shield": {
-    "text": "CHARGE SHIELD",
-    "font": "assets/fnt/PressStart2P.ttf",
-    "size": 8,
-    "color": {
-      "r": 255,
-      "g": 255,
-      "b": 255
+    "high_score_color": {
+        "r": 30,
+        "g": 144,
+        "b": 255
     },
-    "position": {
-      "x": 20,
-      "y": 310
-    }
-  },
-  "shieldPercentage": {
-    "font": "assets/fnt/PressStart2P.ttf",
-    "size": 8,
-    "color": {
-      "r": 255,
-      "g": 255,
-      "b": 0
-    },
-    "position": {
-      "x": 20,
-      "y": 310
-    }
-  }
+    "high_score_max_value": 1000
 }

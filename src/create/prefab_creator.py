@@ -1,7 +1,6 @@
 import random
 import pygame
 import esper
-from src.ecs.components.c_charge_shield import CChargeShield
 
 from src.ecs.components.c_enemy_spawner import CEnemySpawner
 from src.ecs.components.c_input_command import CInputCommand
@@ -186,33 +185,3 @@ def create_pause_text(world: esper.World, interface_info: dict):
     txt_ent = create_text(
         world, text, font, color, pos)
     return txt_ent
-
-
-def create_special_shield_interface(world: esper.World, interface_info: dict, player_info: dict) -> int:
-    text_desc_special = interface_info["shield"]["text"]
-    font_desc_special = ServiceLocator.texts_service.get(interface_info["shield"]["font"],
-                                                         interface_info["shield"]["size"])
-    color_desc_special = pygame.Color(interface_info["shield"]["color"]["r"],
-                                      interface_info["shield"]["color"]["g"],
-                                      interface_info["shield"]["color"]["b"])
-    pos_desc_special = pygame.Vector2(interface_info["shield"]["position"]["x"],
-                                      interface_info["shield"]["position"]["y"])
-    create_text(world, text_desc_special, font_desc_special,
-                color_desc_special, pos_desc_special)
-
-    charge_special_font = ServiceLocator.texts_service.get(
-        interface_info["shieldPercentage"]["font"], interface_info["shieldPercentage"]["size"])
-    charge_special_color = pygame.Color(0, 255, 0)
-    charge_special_pos = pos_desc_special.copy() + pygame.Vector2(0, 15)
-    charge_special_text = "100%"
-    bullet_charge_text = create_text(
-        world, charge_special_text, charge_special_font, charge_special_color, charge_special_pos)
-    world.add_component(bullet_charge_text,
-                        CChargeShield(player_info["charge_time_special"]))
-    return bullet_charge_text
-
-def create_shield(world: esper.World, playerPos: pygame.Vector2, player_info: dict) -> int:
-    shield_surface = ServiceLocator.images_service.get(player_info["image_special"])
-    shield_entity = create_sprite(world, playerPos, pygame.Vector2(0, 0), shield_surface)
-    world.add_component(shield_entity, CTagShield())
-    world.add_component(shield_entity, CAnimation(player_info["shield_animations"]))
