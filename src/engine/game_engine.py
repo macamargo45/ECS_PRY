@@ -80,6 +80,8 @@ class GameEngine:
             self.explosion_cfg = json.load(explosion_file)
         with open("assets/cfg/interface.json") as interface_file:
             self.interface_cfg = json.load(interface_file)
+        with open("assets/cfg/starfield.json") as starfield_file:
+            self.starfield_cfg = json.load(starfield_file)
 
     async def run(self, start_scene_name:str) -> None:
         self.is_running = True
@@ -102,7 +104,7 @@ class GameEngine:
 
     def _calculate_time(self):
         self.clock.tick(self.framerate)
-        self.delta_time = self.clock.get_time() / 1000.0
+        self._delta_time = self.clock.get_time() / 1000.0
 
     def _process_events(self):
         for event in pygame.event.get():

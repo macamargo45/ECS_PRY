@@ -15,6 +15,7 @@ from src.ecs.components.c_animation import CAnimation
 from src.ecs.components.c_player_state import CPlayerState
 from src.ecs.components.c_enemy_hunter_state import CEnemyHunterState
 from src.ecs.components.tags.c_tag_shield import CTagShield
+from src.ecs.components.c_star_blink import CStarBlink
 from src.engine.service_locator import ServiceLocator
 
 
@@ -185,3 +186,25 @@ def create_pause_text(world: esper.World, interface_info: dict):
     txt_ent = create_text(
         world, text, font, color, pos)
     return txt_ent
+
+def create_starfield(world: esper.World,
+                            starfield_info:dict,
+                            window_size:pygame.Rect):
+    window_width = window_size.w
+    window_height = window_size.h
+    size = pygame.Vector2(1,1)
+    for starindex in range(starfield_info["number_of_stars"]):
+        star_entity = world.create_entity()
+        color_index = random.randint(0,len(starfield_info["star_colors"]) - 1)
+        color = pygame.Color(
+            starfield_info["star_colors"][color_index]["r"],
+            starfield_info["star_colors"][color_index]["g"],
+            starfield_info["star_colors"][color_index]["b"])
+        vertical_speed = random.randint(starfield_info["vertical_speed"]["min"], starfield_info["vertical_speed"]["max"])
+        blink_rate = random.uniform(starfield_info["blink_rate"]["min"], starfield_info["blink_rate"]["max"])
+        initial_position = pygame.Vector2(random.randint(0,window_width),
+                                          random.randint(0,window_height))
+        world.add_component(star_entity, CSurface(size, color))
+        world.add_component(star_entity, CTransform(initial_position))
+        world.add_component(star_entity, CVelocity(pygame.Vector2(0, vertical_speed)))
+        world.add_component(star_entity, CStarBlink(blink_rate))
