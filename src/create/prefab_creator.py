@@ -1,3 +1,4 @@
+from enum import Enum
 import random
 import pygame
 import esper
@@ -15,7 +16,8 @@ from src.ecs.components.c_animation import CAnimation
 from src.ecs.components.c_player_state import CPlayerState
 from src.ecs.components.c_enemy_hunter_state import CEnemyHunterState
 from src.ecs.components.tags.c_tag_shield import CTagShield
-from src.ecs.components.c_star_blink import CStarBlink
+from src.ecs.components.c_blink import CBlink
+from src.ecs.components.tags.c_tag_star import CTagStar
 from src.engine.service_locator import ServiceLocator
 
 
@@ -41,6 +43,15 @@ def create_sprite(world: esper.World, pos: pygame.Vector2, vel: pygame.Vector2,
     world.add_component(sprite_entity,
                         CSurface.from_surface(surface))
     return sprite_entity
+
+def create_banner(world: esper.World, pos: pygame.Vector2,surface: pygame.Surface) -> int:
+    sprite_entity = world.create_entity()
+    world.add_component(sprite_entity,
+                        CTransform(pos))
+    world.add_component(sprite_entity,
+                        CSurface.from_surface(surface))
+    return sprite_entity
+
 
 
 def create_enemy_square(world: esper.World, pos: pygame.Vector2, enemy_info: dict):
@@ -166,14 +177,29 @@ def create_interface(world: esper.World, interface_info: dict):
     create_text(world, text_desc, font_desc, color_desc, pos_desc)
 
 
-def create_text(world: esper.World, text: str, font: pygame.font.Font, color: pygame.Color, pos: pygame.Vector2):
-    text_entity = world.create_entity()
-    world.add_component(text_entity,
-                        CTransform(pos))
-    world.add_component(text_entity,
-                        CSurface.from_text(text, font, color))
-    return text_entity
+class TextAlignment(Enum):
+    LEFT = 0,
+    RIGHT = 1
+    CENTER = 2
 
+def create_text(world:esper.World, txt:str, size:int, 
+                color:pygame.Color, pos:pygame.Vector2, alignment:TextAlignment) -> int:
+    font = ServiceLocator.fonts_service.get("assets/fnt/PressStart2P.ttf", size)
+    text_entity = world.create_entity()
+
+    world.add_component(text_entity, CSurface.from_text(txt, font, color))
+    txt_s = world.component_for_entity(text_entity, CSurface)
+
+    # De acuerdo al alineamiento, determia el origine de la superficie
+    origin = pygame.Vector2(0, 0)
+    if alignment is TextAlignment.RIGHT:
+        origin.x -= txt_s.area.right
+    elif alignment is TextAlignment.CENTER:
+        origin.x -= txt_s.area.centerx
+
+    world.add_component(text_entity,
+                        CTransform(pos + origin))
+    return text_entity
 
 def create_pause_text(world: esper.World, interface_info: dict):
     font = ServiceLocator.texts_service.get(interface_info["pauseText"]["font"],
@@ -207,4 +233,5 @@ def create_starfield(world: esper.World,
         world.add_component(star_entity, CSurface(size, color))
         world.add_component(star_entity, CTransform(initial_position))
         world.add_component(star_entity, CVelocity(pygame.Vector2(0, vertical_speed)))
-        world.add_component(star_entity, CStarBlink(blink_rate))
+        world.add_component(star_entity, CBlink(blink_rate))
+        world.add_component(star_entity, CTagStar())
