@@ -1,30 +1,30 @@
 {
     "TypeA": {
-        "image": "assets/img/asteroid_01.png",
+        "image": "assets/img/invaders_enemy_01.png",
         "sound": "assets/snd/asteroid.ogg",
         "velocity_min": 25,
         "velocity_max": 50
     },
     "TypeB": {
-        "image": "assets/img/asteroid_02.png",
+        "image": "assets/img/invaders_enemy_02.png",
         "sound": "assets/snd/asteroid.ogg",
         "velocity_min": 50,
         "velocity_max": 75
     },
     "TypeC": {
-        "image": "assets/img/asteroid_03.png",
+        "image": "assets/img/invaders_enemy_03.png",
         "sound": "assets/snd/asteroid.ogg",
         "velocity_min": 75,
         "velocity_max": 100
     },
     "TypeD": {
-        "image": "assets/img/asteroid_04.png",
+        "image": "assets/img/invaders_enemy_04.png",
         "sound": "assets/snd/asteroid.ogg",
         "velocity_min": 100,
         "velocity_max": 125
     },
     "TypeHunter": {
-        "image": "assets/img/enemy.png",
+        "image": "assets/img/invaders_enemy_01.png",
         "animations": {
             "number_frames": 6,
             "list": [

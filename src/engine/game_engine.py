@@ -1,5 +1,10 @@
 import asyncio
 import json
+from src.engine.scenes.base_scene import Scene
+from src.engine.scenes.gameove_scene import GameoverScene
+from src.engine.scenes.menu_scene import MenuScene
+from src.engine.scenes.play_scene import PlayScene
+from src.engine.scenes.win_scene import WinScene
 import pygame
 import esper
 from src.ecs.systems.s_animation import system_animation
@@ -42,8 +47,8 @@ class GameEngine:
         self.clock = pygame.time.Clock()
         self.is_running = False
         self.framerate = self.window_cfg["framerate"]
-        self.delta_time = 0
-        self.bg_color = pygame.Color(self.window_cfg["bg_color"]["r"],
+        self._delta_time = 0
+        self._bg_color = pygame.Color(self.window_cfg["bg_color"]["r"],
                                      self.window_cfg["bg_color"]["g"],
                                      self.window_cfg["bg_color"]["b"])
         self.ecs_world = esper.World()
@@ -51,6 +56,14 @@ class GameEngine:
         self.num_bullets = 0
 
         self.paused = False
+        
+        self._scenes:dict[str, Scene] = {}
+        self._scenes["MENU_SCENE"] = MenuScene(self)
+        self._scenes["LEVEL_01"] = PlayScene("assets/cfg/level_01.json",self)
+        self._scenes["WIN_SCENE"] = WinScene(self)
+        self._scenes["GAME_OVER_SCENE"] = GameoverScene(self)
+        self._current_scene:Scene = None
+        self._scene_name_to_switch:str = None
 
     def _load_config_files(self):
         with open("assets/cfg/window.json", encoding="utf-8") as window_file:
@@ -68,30 +81,24 @@ class GameEngine:
         with open("assets/cfg/interface.json") as interface_file:
             self.interface_cfg = json.load(interface_file)
 
-    async def run(self) -> None:
-        self._create()
+    async def run(self, start_scene_name:str) -> None:
         self.is_running = True
+        self._current_scene = self._scenes[start_scene_name]
+        self._create()
         while self.is_running:
             self._calculate_time()
             self._process_events()
             self._update()
             self._draw()
+            self._handle_switch_scene()
             await asyncio.sleep(0)
         self._clean()
+    
+    def switch_scene(self, new_scene_name:str):
+        self._scene_name_to_switch = new_scene_name
 
     def _create(self):
-        self._player_entity = create_player_square(
-            self.ecs_world, self.player_cfg, self.level_01_cfg["player_spawn"])
-        self._player_c_v = self.ecs_world.component_for_entity(
-            self._player_entity, CVelocity)
-        self._player_c_t = self.ecs_world.component_for_entity(
-            self._player_entity, CTransform)
-        self._player_c_s = self.ecs_world.component_for_entity(
-            self._player_entity, CSurface)
-
-        create_enemy_spawner(self.ecs_world, self.level_01_cfg)
-        create_input_player(self.ecs_world)
-        create_interface(self.ecs_world, self.interface_cfg)
+        self._current_scene.do_create()
 
     def _calculate_time(self):
         self.clock.tick(self.framerate)
@@ -99,77 +106,29 @@ class GameEngine:
 
     def _process_events(self):
         for event in pygame.event.get():
-            system_input_player(self.ecs_world, event, self._do_action)
+            self._current_scene.do_process_events(event)
             if event.type == pygame.QUIT:
                 self.is_running = False
 
     def _update(self):
-        if self.paused:
-            return
-        system_enemy_spawner(self.ecs_world, self.enemies_cfg, self.delta_time)
-        system_movement(self.ecs_world, self.delta_time)
-
-        system_screen_bounce(self.ecs_world, self.screen)
-        system_screen_player(self.ecs_world, self.screen)
-        system_screen_bullet(self.ecs_world, self.screen)
-
-        system_collision_enemy_bullet(self.ecs_world, self.explosion_cfg)
-        system_collision_player_enemy(self.ecs_world, self._player_entity,
-                                      self.level_01_cfg, self.explosion_cfg)
-
-        system_explosion_kill(self.ecs_world)
-
-        system_player_state(self.ecs_world)
-        system_enemy_hunter_state(
-            self.ecs_world, self._player_entity, self.enemies_cfg["TypeHunter"])
-
-        system_animation(self.ecs_world, self.delta_time)
-
-        self.ecs_world._clear_dead_entities()
-        self.num_bullets = len(self.ecs_world.get_component(CTagBullet))
+        self._current_scene.simulate(self._delta_time)
 
     def _draw(self):
-        self.screen.fill(self.bg_color)
-        system_rendering(self.ecs_world, self.screen)
+        self.screen.fill(self._bg_color)        
+        self._current_scene.do_draw(self.screen)
         pygame.display.flip()
 
-    def _clean(self):
-        self.ecs_world.clear_database()
+    def _handle_switch_scene(self):
+        if self._scene_name_to_switch is not None:
+            self._current_scene.clean()
+            self._current_scene = self._scenes[self._scene_name_to_switch]
+            self._current_scene.do_create()
+            self._scene_name_to_switch = None
+
+    def _do_action(self, action:CInputCommand):        
+        self._current_scene.do_action(action)
+
+    def _do_clean(self):
+        if self._current_scene is not None:
+            self._current_scene.clean()
         pygame.quit()
-
-    def _do_action(self, c_input: CInputCommand):
-        if c_input.name == "PAUSE_GAME" and c_input.phase == CommandPhase.START:
-            self.paused = not self.paused
-            if self.paused:
-                self.paused_text = create_pause_text(
-                    self.ecs_world, self.interface_cfg)
-            else:
-                self.ecs_world.delete_entity(self.paused_text)
-
-        if c_input.name == "PLAYER_LEFT":
-            if c_input.phase == CommandPhase.START:
-                self._player_c_v.vel.x -= self.player_cfg["input_velocity"]
-            elif c_input.phase == CommandPhase.END:
-                self._player_c_v.vel.x += self.player_cfg["input_velocity"]
-        if c_input.name == "PLAYER_RIGHT":
-            if c_input.phase == CommandPhase.START:
-                self._player_c_v.vel.x += self.player_cfg["input_velocity"]
-            elif c_input.phase == CommandPhase.END:
-                self._player_c_v.vel.x -= self.player_cfg["input_velocity"]
-        if c_input.name == "PLAYER_UP":
-            if c_input.phase == CommandPhase.START:
-                self._player_c_v.vel.y -= self.player_cfg["input_velocity"]
-            elif c_input.phase == CommandPhase.END:
-                self._player_c_v.vel.y += self.player_cfg["input_velocity"]
-        if c_input.name == "PLAYER_DOWN":
-            if c_input.phase == CommandPhase.START:
-                self._player_c_v.vel.y += self.player_cfg["input_velocity"]
-            elif c_input.phase == CommandPhase.END:
-                self._player_c_v.vel.y -= self.player_cfg["input_velocity"]
-
-        if self.paused:
-            return
-        
-        if c_input.name == "PLAYER_FIRE" and self.num_bullets < self.level_01_cfg["player_spawn"]["max_bullets"]:
-            create_bullet(self.ecs_world, c_input.mouse_pos, self._player_c_t.pos,
-                          self._player_c_s.area.size, self.bullet_cfg)
