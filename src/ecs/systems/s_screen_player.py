@@ -7,8 +7,7 @@ from src.ecs.components.c_velocity import CVelocity
 from src.ecs.components.tags.c_tag_player import CTagPlayer
 
 
-def system_screen_player(world: esper.World, screen: pygame.Surface):
-    screen_rect = screen.get_rect()
+def system_screen_player(world: esper.World, screen_rect):
     components = world.get_components(CTransform, CSurface, CVelocity, CTagPlayer)
     for _, (c_t, c_s, c_v, _) in components:
         player_rect = c_s.area.copy()

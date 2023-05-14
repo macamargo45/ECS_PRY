@@ -100,29 +100,17 @@ def create_enemy_spawner(world: esper.World, level_data: dict):
 def create_input_player(world: esper.World):
     input_left = world.create_entity()
     input_right = world.create_entity()
-    input_up = world.create_entity()
-    input_down = world.create_entity()
 
-    world.add_component(input_left,
-                        CInputCommand("PLAYER_LEFT", pygame.K_LEFT))
-    world.add_component(input_right,
-                        CInputCommand("PLAYER_RIGHT", pygame.K_RIGHT))
-    world.add_component(input_up,
-                        CInputCommand("PLAYER_UP", pygame.K_UP))
-    world.add_component(input_down,
-                        CInputCommand("PLAYER_DOWN", pygame.K_DOWN))
+    world.add_component(input_left, CInputCommand("PLAYER_LEFT", pygame.K_LEFT))
+    world.add_component(input_right, CInputCommand("PLAYER_RIGHT", pygame.K_RIGHT))
 
     pause_game = world.create_entity()
-    world.add_component(pause_game,
-                        CInputCommand("PAUSE_GAME", pygame.K_p))
+    world.add_component(pause_game,CInputCommand("PAUSE_GAME", pygame.K_p))
 
     input_fire = world.create_entity()
-    world.add_component(input_fire,
-                        CInputCommand("PLAYER_FIRE", pygame.BUTTON_LEFT))
+    world.add_component(input_fire, CInputCommand("PLAYER_FIRE", pygame.BUTTON_LEFT))
     
-    input_active_shield = world.create_entity()
-    world.add_component(input_active_shield,
-                        CInputCommand("PLAYER_ACTIVE_SHIELD", pygame.BUTTON_RIGHT))
+    
 
 
 def create_bullet(world: esper.World,

@@ -2,8 +2,9 @@ from enum import Enum
 
 
 class CPlayerState:
-    def __init__(self):
+    def __init__(self, lives:int):
         self.state = PlayerState.IDLE
+        self.lives = lives
 
 
 class PlayerState(Enum):
