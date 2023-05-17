@@ -108,20 +108,15 @@ def create_input_player(world: esper.World):
     world.add_component(pause_game,CInputCommand("PAUSE_GAME", pygame.K_p))
 
     input_fire = world.create_entity()
-    world.add_component(input_fire, CInputCommand("PLAYER_FIRE", pygame.BUTTON_LEFT))
+    world.add_component(input_fire, CInputCommand("PLAYER_FIRE", pygame.K_z))
     
     
 
 
-def create_bullet(world: esper.World,
-                  mouse_pos: pygame.Vector2,
-                  player_pos: pygame.Vector2,
-                  player_size: pygame.Vector2,
-                  bullet_info: dict):
+def create_bullet(world: esper.World,mouse_pos: pygame.Vector2,player_pos: pygame.Vector2,player_size: pygame.Vector2,bullet_info: dict):
     bullet_surface = ServiceLocator.images_service.get(bullet_info["image"])
     bullet_size = bullet_surface.get_rect().size
-    pos = pygame.Vector2(player_pos.x + (player_size[0] / 2) - (bullet_size[0] / 2),
-                         player_pos.y + (player_size[1] / 2) - (bullet_size[1] / 2))
+    pos = pygame.Vector2(player_pos.x + (player_size[0] / 2) - (bullet_size[0] / 2),player_pos.y + (player_size[1] / 2) - (bullet_size[1] / 2))
     vel = (mouse_pos - player_pos)
     vel = vel.normalize() * bullet_info["velocity"]
 

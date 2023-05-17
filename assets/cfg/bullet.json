@@ -1,5 +1,16 @@
 {
-    "image": "assets/img/bullet.png",
-    "sound": "assets/snd/laser.ogg",
-    "velocity": 200
+    "sound": "assets/snd/player_shoot.ogg",
+    "size": {
+        "w": 1,
+        "h": 3
+    },
+    "velocity": {
+        "x": 0,
+        "y": -500
+    },
+    "color": {
+        "r": 255,
+        "g": 158,
+        "b": 57
+    }
 }
