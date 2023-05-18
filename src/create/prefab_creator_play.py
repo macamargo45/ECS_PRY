@@ -60,17 +60,6 @@ def create_enemy(world: esper.World, pos: pygame.Vector2, velocity: pygame.Vecto
     world.add_component(enemy_entity, CTagEnemy(score_value))
     world.add_component(enemy_entity, CAnimation(animations))
     enemy_state = CEnemyState()
-    enemy_state.fold_pos = pos.copy()
-    world.add_component(enemy_entity, enemy_state)
-
-
-def create_enemy(world: esper.World, pos: pygame.Vector2, velocity: pygame.Vector2, score_value: float, score_value_attack: float, image_path: str, animations: dict):
-    image = ServiceLocator.images_service.get(image_path)
-    enemy_entity = create_sprite(world, pos, velocity, image)
-    world.add_component(enemy_entity, CTagEnemy(score_value))
-    world.add_component(enemy_entity, CAnimation(animations))
-    enemy_state = CEnemyState()
-    enemy_state.fold_pos = pos.copy()
     world.add_component(enemy_entity, enemy_state)
 
 
