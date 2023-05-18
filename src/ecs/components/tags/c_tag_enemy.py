@@ -1,3 +1,3 @@
 class CTagEnemy:
-    def __init__(self, enemy_type: str) -> None:
-        self.enemy_type = enemy_type
+    def __init__(self, score_value:float,) -> None:
+        self.score_value = score_value
