@@ -80,5 +80,10 @@
         }
     },
     "menu_scroll_vel": 50,
-    "high_score_max_value": 1000
+    "high_score_max_value": 1000,
+    "ready_text_color": {
+        "r": 255,
+        "g": 255,
+        "b": 255
+    }
 }
