@@ -16,7 +16,7 @@ from src.ecs.systems.s_enemy_movement import system_enemy_movement
 from src.ecs.systems.s_enemy_state import system_enemy_state
 from src.create.prefab_creator import create_input_player, create_starfield
 from src.create.prefab_creator_play import create_army, create_player, create_player_bullet, create_ready_text
-from src.create.prefab_interface_creator import create_paused_text
+from src.create.prefab_interface_creator import create_paused_text, create_menu
 from src.engine.scenes.base_scene import Scene
 from src.engine.service_locator import ServiceLocator
 
@@ -43,6 +43,8 @@ class PlayScene(Scene):
             "assets/cfg/level_01.json")
         
         ServiceLocator.sounds_service.play(self.level_cfg["ready_game_sound"])
+
+        create_menu(self.ecs_world, False)
 
     def do_update(self, delta_time: float):
         system_start_movement(self.ecs_world, delta_time, self.screen_rect.h)

@@ -86,10 +86,29 @@
         "g": 255,
         "b": 255
     },
+    "title_text_color": {
+        "r": 255,
+        "g": 0,
+        "b": 0
+    },
     "pause_text_color": {
         "r": 255,
         "g": 0,
         "b": 0
     },
-    "interface_blink_rate": 0.5
+    "base_text_color": {
+        "r": 255,
+        "g": 255,
+        "b": 255
+    },
+    "high_score_color": {
+        "r": 30,
+        "g": 144,
+        "b": 255
+    },
+    "interface_blink_rate": 0.5,
+    "vertical_card": {
+        "v_speed": -50,
+        "v_offset": 240
+    }
 }
