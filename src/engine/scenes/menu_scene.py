@@ -9,7 +9,7 @@ from src.ecs.systems.s_movement import system_movement
 from src.ecs.systems.s_animation import system_animation
 from src.create.prefab_creator import create_starfield
 from src.ecs.components.c_input_command import CInputCommand
-from src.ecs.systems.s_star_movement import system_star_movement
+from src.ecs.systems.s_start_movement import system_start_movement
 import pygame
 from src.create.prefab_creator import create_text, TextAlignment
 from src.engine.scenes.base_scene import Scene
@@ -66,7 +66,7 @@ class MenuScene(Scene):
 
     def do_update(self, delta_time: float):
         system_up_scroll(self.ecs_world, delta_time)
-        system_star_movement(self.ecs_world, delta_time, self.screen_rect.h)
+        system_start_movement(self.ecs_world, delta_time, self.screen_rect.h)
         system_blink(self.ecs_world, delta_time)
         system_movement(self.ecs_world, delta_time)
 

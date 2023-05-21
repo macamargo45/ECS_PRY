@@ -6,7 +6,7 @@ from src.ecs.components.c_surface import CSurface
 from src.ecs.components.c_blink import CBlink
 from src.ecs.components.c_transform import CTransform
 
-def system_star_movement(world:esper.World, delta_time:float, window_height: int):
+def system_start_movement(world:esper.World, delta_time:float, window_height: int):
     components = world.get_components(CTransform, CTagStar)
     for _, (c_t, c_ts) in components:
         if c_t.pos.y > window_height:

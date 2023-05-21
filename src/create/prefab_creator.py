@@ -44,14 +44,14 @@ def create_sprite(world: esper.World, pos: pygame.Vector2, vel: pygame.Vector2,
                         CSurface.from_surface(surface))
     return sprite_entity
 
-def create_banner(world: esper.World, pos: pygame.Vector2,surface: pygame.Surface) -> int:
+
+def create_banner(world: esper.World, pos: pygame.Vector2, surface: pygame.Surface) -> int:
     sprite_entity = world.create_entity()
     world.add_component(sprite_entity,
                         CTransform(pos))
     world.add_component(sprite_entity,
                         CSurface.from_surface(surface))
     return sprite_entity
-
 
 
 def create_enemy_square(world: esper.World, pos: pygame.Vector2, enemy_info: dict):
@@ -101,22 +101,23 @@ def create_input_player(world: esper.World):
     input_left = world.create_entity()
     input_right = world.create_entity()
 
-    world.add_component(input_left, CInputCommand("PLAYER_LEFT", pygame.K_LEFT))
-    world.add_component(input_right, CInputCommand("PLAYER_RIGHT", pygame.K_RIGHT))
+    world.add_component(input_left, CInputCommand(
+        "PLAYER_LEFT", pygame.K_LEFT))
+    world.add_component(input_right, CInputCommand(
+        "PLAYER_RIGHT", pygame.K_RIGHT))
 
     pause_game = world.create_entity()
-    world.add_component(pause_game,CInputCommand("PAUSE_GAME", pygame.K_p))
+    world.add_component(pause_game, CInputCommand("PAUSE_GAME", pygame.K_p))
 
     input_fire = world.create_entity()
     world.add_component(input_fire, CInputCommand("PLAYER_FIRE", pygame.K_z))
-    
-    
 
 
-def create_bullet(world: esper.World,mouse_pos: pygame.Vector2,player_pos: pygame.Vector2,player_size: pygame.Vector2,bullet_info: dict):
+def create_bullet(world: esper.World, mouse_pos: pygame.Vector2, player_pos: pygame.Vector2, player_size: pygame.Vector2, bullet_info: dict):
     bullet_surface = ServiceLocator.images_service.get(bullet_info["image"])
     bullet_size = bullet_surface.get_rect().size
-    pos = pygame.Vector2(player_pos.x + (player_size[0] / 2) - (bullet_size[0] / 2),player_pos.y + (player_size[1] / 2) - (bullet_size[1] / 2))
+    pos = pygame.Vector2(player_pos.x + (player_size[0] / 2) - (
+        bullet_size[0] / 2), player_pos.y + (player_size[1] / 2) - (bullet_size[1] / 2))
     vel = (mouse_pos - player_pos)
     vel = vel.normalize() * bullet_info["velocity"]
 
@@ -165,9 +166,11 @@ class TextAlignment(Enum):
     RIGHT = 1
     CENTER = 2
 
-def create_text(world:esper.World, txt:str, size:int, 
-                color:pygame.Color, pos:pygame.Vector2, alignment:TextAlignment) -> int:
-    font = ServiceLocator.fonts_service.get("assets/fnt/PressStart2P.ttf", size)
+
+def create_text(world: esper.World, txt: str, size: int,
+                color: pygame.Color, pos: pygame.Vector2, alignment: TextAlignment) -> int:
+    font = ServiceLocator.fonts_service.get(
+        "assets/fnt/PressStart2P.ttf", size)
     text_entity = world.create_entity()
 
     world.add_component(text_entity, CSurface.from_text(txt, font, color))
@@ -184,6 +187,7 @@ def create_text(world:esper.World, txt:str, size:int,
                         CTransform(pos + origin))
     return text_entity
 
+
 def create_pause_text(world: esper.World, interface_info: dict):
     font = ServiceLocator.texts_service.get(interface_info["pauseText"]["font"],
                                             interface_info["pauseText"]["size"])
@@ -196,25 +200,29 @@ def create_pause_text(world: esper.World, interface_info: dict):
         world, text, font, color, pos)
     return txt_ent
 
+
 def create_starfield(world: esper.World,
-                            starfield_info:dict,
-                            window_size:pygame.Rect):
+                     starfield_info: dict,
+                     window_size: pygame.Rect):
     window_width = window_size.w
     window_height = window_size.h
-    size = pygame.Vector2(1,1)
+    size = pygame.Vector2(1, 1)
     for starindex in range(starfield_info["number_of_stars"]):
         star_entity = world.create_entity()
-        color_index = random.randint(0,len(starfield_info["star_colors"]) - 1)
+        color_index = random.randint(0, len(starfield_info["star_colors"]) - 1)
         color = pygame.Color(
             starfield_info["star_colors"][color_index]["r"],
             starfield_info["star_colors"][color_index]["g"],
             starfield_info["star_colors"][color_index]["b"])
-        vertical_speed = random.randint(starfield_info["vertical_speed"]["min"], starfield_info["vertical_speed"]["max"])
-        blink_rate = random.uniform(starfield_info["blink_rate"]["min"], starfield_info["blink_rate"]["max"])
-        initial_position = pygame.Vector2(random.randint(0,window_width),
-                                          random.randint(0,window_height))
+        vertical_speed = random.randint(
+            starfield_info["vertical_speed"]["min"], starfield_info["vertical_speed"]["max"])
+        blink_rate = random.uniform(
+            starfield_info["blink_rate"]["min"], starfield_info["blink_rate"]["max"])
+        initial_position = pygame.Vector2(random.randint(0, window_width),
+                                          random.randint(0, window_height))
         world.add_component(star_entity, CSurface(size, color))
         world.add_component(star_entity, CTransform(initial_position))
-        world.add_component(star_entity, CVelocity(pygame.Vector2(0, vertical_speed)))
+        world.add_component(star_entity, CVelocity(
+            pygame.Vector2(0, vertical_speed)))
         world.add_component(star_entity, CBlink(blink_rate))
         world.add_component(star_entity, CTagStar())
