@@ -7,6 +7,7 @@ from src.ecs.systems.s_blink import system_blink
 from src.ecs.systems.s_bullet import system_bullet
 from src.ecs.systems.s_bullet_in_ship import system_bullet_in_ship
 from src.ecs.systems.s_collision_enemy_bullet import system_collision_enemy_bullet
+from src.ecs.systems.s_explosion_kill import system_explosion_kill
 from src.ecs.systems.s_manager_level import system_level_manager
 from src.ecs.systems.s_movement import system_movement
 from src.ecs.systems.s_screen_player import system_screen_player
@@ -53,6 +54,7 @@ class PlayScene(Scene):
             system_bullet(self.ecs_world, self.pl_entity, self.screen_rect)
             system_bullet_in_ship(self.ecs_world)
             system_collision_enemy_bullet(self.ecs_world)
+            system_explosion_kill(self.ecs_world)
 
         system_blink(self.ecs_world, delta_time)
         system_screen_player(self.ecs_world, self.screen_rect)
