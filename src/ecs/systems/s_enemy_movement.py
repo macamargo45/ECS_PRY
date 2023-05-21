@@ -5,20 +5,18 @@ from src.ecs.components.c_transform import CTransform
 from src.ecs.components.tags.c_tag_enemy import CTagEnemy
 
 
-def _get_army_direction(world: esper.World) -> int:
+def get_and_change_army_direction(world: esper.World, change_direction=False) -> int:
     components = world.get_component(CEnemyFly)
     for _, c_sqd in components:
+        if change_direction:
+            c_sqd.dir *= -1
         return c_sqd.dir, c_sqd.dir_vel
+    return 1, 1
 
-
-def _change_army_direction(world: esper.World) -> int:
-    dir = 1
-    components = world.get_component(CEnemyFly)
-    for _, c_sqd in components:
-        c_sqd.dir *= -1
-        dir = c_sqd.dir
-    return dir
-
+def update_enemy_positions(world: esper.World, dir, vel, delta_time):
+    components = world.get_components(CEnemyState, CTagEnemy)
+    for _, (c_st, _) in components:
+        c_st.move_pos.x += dir * vel * delta_time
 
 def system_enemy_movement(world: esper.World, delta_time: float):
     left_most_x = None
@@ -35,21 +33,12 @@ def system_enemy_movement(world: esper.World, delta_time: float):
             right_most_x_tr = c_t
 
     if left_most_x is None and right_most_x is None:
-        components = world.get_component(CEnemyFly)
-        for _, c_sqd in components:
-            c_sqd.dir = 1
-            dir = c_sqd.dir
-        return
-
-    dir, vel = _get_army_direction(world)
-    if left_most_x < 13 or right_most_x > 218:
+        dir, vel = get_and_change_army_direction(world)
+    else:
+        dir, vel = get_and_change_army_direction(world, left_most_x < 13 or right_most_x > 218)
         if left_most_x < 13:
-            dir = _change_army_direction(world)
             left_most_x_tr.pos.x = 13
         elif right_most_x > 218:
-            dir = _change_army_direction(world)
             right_most_x_tr.pos.x = 218
 
-    components = world.get_components(CEnemyState, CTagEnemy)
-    for _, (c_st, _) in components:
-        c_st.move_pos.x += dir * vel * delta_time
+    update_enemy_positions(world, dir, vel, delta_time)
