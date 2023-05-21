@@ -40,8 +40,11 @@ class PlayScene(Scene):
 
         self.level_cfg = ServiceLocator.configs_service.get(
             "assets/cfg/level_01.json")
+        
+        ServiceLocator.sounds_service.play(self.level_cfg["ready_game_sound"])
 
     def do_update(self, delta_time: float):
+        system_start_movement(self.ecs_world, delta_time, self.screen_rect.h)
         if self.c_manager_level.state != LevelState.PAUSED:
             system_movement(self.ecs_world, delta_time)
             system_enemy_movement(self.ecs_world, delta_time)
@@ -51,7 +54,6 @@ class PlayScene(Scene):
             system_bullet_in_ship(self.ecs_world)
             system_collision_enemy_bullet(self.ecs_world)
 
-        system_start_movement(self.ecs_world, delta_time, self.screen_rect.h)
         system_blink(self.ecs_world, delta_time)
         system_screen_player(self.ecs_world, self.screen_rect)
         system_level_manager(self.ecs_world, self.c_manager_level, delta_time)
