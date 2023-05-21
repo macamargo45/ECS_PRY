@@ -10,6 +10,7 @@ from src.ecs.systems.s_movement import system_movement
 from src.ecs.systems.s_screen_player import system_screen_player
 from src.ecs.systems.s_star_movement import system_star_movement
 from src.ecs.systems.s_enemy_movement import system_enemy_movement
+from src.ecs.systems.s_enemy_state import system_enemy_state
 from src.create.prefab_creator import create_input_player, create_starfield
 from src.create.prefab_creator_play import create_army, create_player, create_player_bullet
 from src.engine.scenes.base_scene import Scene
@@ -37,6 +38,7 @@ class PlayScene(Scene):
         system_animation(self.ecs_world, delta_time)
         system_collision_enemy_bullet(self.ecs_world)
         system_enemy_movement(self.ecs_world, delta_time)
+        system_enemy_state(self.ecs_world)
 
     def do_action(self, action: CInputCommand) -> None:
         if action.name == "PLAYER_LEFT":

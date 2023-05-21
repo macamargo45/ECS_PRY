@@ -7,4 +7,4 @@ class EnemyStates(Enum):
 class CEnemyState:
     def __init__(self) -> None:
         self.state:EnemyStates = EnemyStates.IDLE
-        self.fold_pos:pygame.Vector2 = pygame.Vector2(0,0)
+        self.move_pos:pygame.Vector2 = pygame.Vector2(0,0)

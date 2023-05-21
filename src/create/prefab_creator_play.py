@@ -4,7 +4,7 @@ from src.create.prefab_creator import create_sprite, create_square
 from src.ecs.components.c_animation import CAnimation
 from src.ecs.components.c_bullet_in_ship import CBulletInShip
 from src.ecs.components.c_bullet_state import CBulletState
-from src.ecs.components.c_enemy_fleet import CEnemyFleet
+from src.ecs.components.c_enemy_fly import CEnemyFly
 from src.ecs.components.c_enemy_state import CEnemyState
 from src.ecs.components.c_player_state import CPlayerState
 from src.ecs.components.c_surface import CSurface
@@ -68,6 +68,7 @@ def create_enemy(world: esper.World, pos: pygame.Vector2, velocity: pygame.Vecto
     world.add_component(enemy_entity, CAnimation(animations))
     enemy_state = CEnemyState()
     world.add_component(enemy_entity, enemy_state)
+    enemy_state.move_pos = pos.copy()
 
 
 def create_army(world: esper.World):
@@ -77,7 +78,7 @@ def create_army(world: esper.World):
     global_speed = pygame.Vector2(0, 0)
     fleet_entity = world.create_entity()
     world.add_component(fleet_entity,
-                        CEnemyFleet(1, level_cfg["enemy_speed"]["x"]))
+                        CEnemyFly(1, level_cfg["enemy_speed"]["x"]))
 
     enemy_configs = [
         enemies_cfg["invaders_enemy_04"],
