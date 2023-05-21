@@ -107,5 +107,8 @@
                 "y": 260
             }
         }
-    ]
+    ],
+    "ready_game_sound": "assets/snd/game_start.ogg",
+    "pause_game_sound": "assets/snd/game_paused.ogg",
+    "game_over_sound": "assets/snd/game_over.ogg"
 }

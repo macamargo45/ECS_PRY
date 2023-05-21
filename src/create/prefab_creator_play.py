@@ -1,6 +1,6 @@
 import pygame
 import esper
-from src.create.prefab_creator import create_sprite, create_square
+from src.create.prefab_creator import TextAlignment, create_sprite, create_square, create_text
 from src.ecs.components.c_animation import CAnimation
 from src.ecs.components.c_bullet_in_ship import CBulletInShip
 from src.ecs.components.c_bullet_state import CBulletState
@@ -120,3 +120,10 @@ def create_army(world: esper.World):
                                      start_pos.y + space_ships * row)
                 create_enemy(world, pos, global_speed, score_value,
                              score_value_attack, image, animations)
+                
+def create_ready_text(world:esper.World) -> int:
+    interface_cfg = ServiceLocator.configs_service.get("assets/cfg/interface.json")
+    color = pygame.Color(interface_cfg["ready_text_color"]["r"],interface_cfg["ready_text_color"]["g"],interface_cfg["ready_text_color"]["b"])
+    pos = pygame.Vector2(128, 144)
+    game_start = create_text(world, "READY", 8, color, pos, TextAlignment.CENTER)
+    return game_start 
