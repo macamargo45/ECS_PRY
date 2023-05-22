@@ -124,6 +124,6 @@ def create_army(world: esper.World):
 def create_ready_text(world:esper.World) -> int:
     interface_cfg = ServiceLocator.configs_service.get("assets/cfg/interface.json")
     color = pygame.Color(interface_cfg["ready_text_color"]["r"],interface_cfg["ready_text_color"]["g"],interface_cfg["ready_text_color"]["b"])
-    pos = pygame.Vector2(128, 144)
+    pos = pygame.Vector2(120, 100)
     game_start = create_text(world, "READY", 8, color, pos, TextAlignment.CENTER)
     return game_start 

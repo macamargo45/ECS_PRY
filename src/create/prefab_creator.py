@@ -159,8 +159,9 @@ def create_bullet(world: esper.World, mouse_pos: pygame.Vector2, player_pos: pyg
     ServiceLocator.sounds_service.play(bullet_info["sound"])
 
 
-def create_explosion(world: esper.World, pos: pygame.Vector2):
+def create_explosion(world: esper.World, pos: pygame.Vector2, type:str):
     explosion_info = ServiceLocator.configs_service.get("assets/cfg/explosion.json")
+    explosion_info = explosion_info[type]
     explosion_surface = ServiceLocator.images_service.get(explosion_info["image"])
     vel = pygame.Vector2(0, 0)
 

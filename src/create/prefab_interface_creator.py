@@ -5,6 +5,7 @@ from typing import Tuple
 from src.ecs.components.c_blink import CBlink
 from src.ecs.components.c_surface import CSurface
 from src.ecs.components.tags.c_tag_score import CTagScore
+from src.ecs.components.tags.c_tag_update_text import CTagUpdateText
 from src.engine.service_locator import ServiceLocator
 from src.create.prefab_creator import create_text, TextAlignment
 from src.ecs.components.c_velocity import CVelocity
@@ -64,8 +65,7 @@ def create_menu(world: esper.World, use_v_card: bool) -> None:
     else:
         high_score_max_value = str(interface_cfg["high_score_max_value"])
 
-    ServiceLocator.general_service.high_score = int(
-        high_score_max_value)
+    ServiceLocator.general_service.high_score = int(high_score_max_value)
 
     one_up_txt = create_text(world, "1UP", 8, title_text_color,
                              pygame.Vector2(32, 18), TextAlignment.LEFT)
@@ -73,10 +73,10 @@ def create_menu(world: esper.World, use_v_card: bool) -> None:
     hiscore_text = create_text(world, "HI-SCORE", 8, title_text_color,
                                pygame.Vector2(90, 18), TextAlignment.LEFT)
 
-    max_score_text = create_text(world, high_score_max_value, 8, high_score_color,
-                                 pygame.Vector2(148, 28), TextAlignment.RIGHT)
+    max_score_text = create_text(world, high_score_max_value, 8, high_score_color,pygame.Vector2(148, 28), TextAlignment.RIGHT)
 
     world.add_component(max_score_text, CTagScore(True))
+    world.add_component(max_score_text, CTagUpdateText())
 
     score_value = create_text(world, player_score, 8, normal_text_color,
                               pygame.Vector2(72, 28), TextAlignment.RIGHT)

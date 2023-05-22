@@ -24,6 +24,7 @@ from src.ecs.systems.s_enemy_state import system_enemy_state
 from src.create.prefab_creator import create_input_player, create_starfield
 from src.create.prefab_creator_play import create_army, create_player, create_player_bullet, create_ready_text
 from src.create.prefab_interface_creator import create_paused_text, create_menu
+from src.ecs.systems.s_update_interface_ import system_update_interface
 from src.engine.scenes.base_scene import Scene
 from src.engine.service_locator import ServiceLocator
 
@@ -62,7 +63,6 @@ class PlayScene(Scene):
             system_movement(self.ecs_world, delta_time)
             system_enemy_movement(self.ecs_world, delta_time)
             system_enemy_state(self.ecs_world)
-            system_animation(self.ecs_world, delta_time)
             system_bullet(self.ecs_world, self.pl_entity, self.screen_rect)
             system_bullet_in_ship(self.ecs_world)
             system_collision_enemy_bullet(self.ecs_world)
@@ -87,7 +87,7 @@ class PlayScene(Scene):
             else:
                 self.pl_v.vel.x -= self.pl_tg.input_speed
 
-        if action.name == "PLAYER_FIRE":
+        if action.name == "PLAYER_FIRE" and action.phase == CommandPhase.START:
             self.bullet.state = BulletStates.FIRED
 
         if action.name == "PAUSE_GAME" and action.phase == CommandPhase.END:
