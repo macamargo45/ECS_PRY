@@ -27,7 +27,7 @@ def create_player(world: esper.World):
 
     world.add_component(player_entity, CTagPlayer(
         player_config["input_speed"]))
-    world.add_component(player_entity, CPlayerState(player_config["lives"]))
+    world.add_component(player_entity, CPlayerState(player_config["lives"], player_config["respawn_time"]))
 
     player_tr = world.component_for_entity(player_entity, CTransform)
     player_v = world.component_for_entity(player_entity, CVelocity)

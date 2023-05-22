@@ -28,6 +28,19 @@ def create_paused_text(world: esper.World) -> Tuple[CSurface, CBlink, int]:
     paused_blk.enabled = False
     return paused_s, paused_blk, paused_com
 
+def create_gameover_text(world: esper.World):
+    interface_cfg = ServiceLocator.configs_service.get(
+        "assets/cfg/interface.json")
+    color = pygame.Color(interface_cfg["gameover_text_color"]["r"],
+                         interface_cfg["gameover_text_color"]["g"],
+                         interface_cfg["gameover_text_color"]["b"])
+    pos = pygame.Vector2(120, 100)
+    paused_com = create_text(world, "GAME OVER", 8, color, pos,
+                             TextAlignment.CENTER)
+
+    world.component_for_entity(paused_com, CSurface)
+    
+
 
 def create_menu(world: esper.World, use_v_card: bool) -> None:
     interface_cfg = ServiceLocator.configs_service.get(

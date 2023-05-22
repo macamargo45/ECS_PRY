@@ -5,5 +5,6 @@
     "spawn_point": { 
         "x": 120,
         "y": 160 
-    }
+    },
+    "respawn_time": 3
 }

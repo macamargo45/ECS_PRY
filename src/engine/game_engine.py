@@ -82,6 +82,8 @@ class GameEngine:
             self.interface_cfg = json.load(interface_file)
         with open("assets/cfg/starfield.json") as starfield_file:
             self.starfield_cfg = json.load(starfield_file)
+        with open("assets/cfg/enemy_bullet.json") as enemybullet_file:
+            self.enemybullet_cfg = json.load(enemybullet_file)
 
     async def run(self, start_scene_name:str) -> None:
         self.is_running = True

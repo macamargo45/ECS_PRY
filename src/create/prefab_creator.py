@@ -1,5 +1,6 @@
 from enum import Enum
 import random
+from src.ecs.components.tags.c_tag_enemybullet import CTagEnemyBullet
 import pygame
 import esper
 
@@ -225,3 +226,21 @@ def create_starfield(world: esper.World,
             pygame.Vector2(0, vertical_speed)))
         world.add_component(star_entity, CBlink(blink_rate))
         world.add_component(star_entity, CTagStar())
+
+def create_enemybullet(world: esper.World, 
+                        enemy_pos: pygame.Vector2, 
+                        enemy_size: pygame.Vector2, 
+                        enemybullet_info: dict):
+    enemybullet_entity = world.create_entity()
+    color = pygame.Color(
+        enemybullet_info["color"]["r"],
+        enemybullet_info["color"]["g"],
+        enemybullet_info["color"]["b"])
+    vertical_speed = enemybullet_info["velocity"]["y"]
+    size = pygame.Vector2(enemybullet_info["size"]["w"], enemybullet_info["size"]["h"])
+    
+    initial_position = pygame.Vector2(enemy_pos.x, enemy_pos.y)
+    world.add_component(enemybullet_entity, CSurface(size, color))
+    world.add_component(enemybullet_entity, CTransform(initial_position))
+    world.add_component(enemybullet_entity, CVelocity(pygame.Vector2(0, vertical_speed)))
+    world.add_component(enemybullet_entity, CTagEnemyBullet())
