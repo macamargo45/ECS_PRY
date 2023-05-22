@@ -85,3 +85,13 @@ def add_v_card_component(world: esper.World, entity: int, pos_y: float,
     world.add_component(entity, CVelocity(pygame.Vector2(0, 0)))
     world.add_component(entity, CVerticalCard(
         v_speed, pos_y + v_offset, pos_y))
+
+
+def create_game_over_text(world: esper.World):
+    interface_cfg = ServiceLocator.configs_service.get(
+        "assets/cfg/interface.json")
+    color = pygame.Color(interface_cfg["base_text_color"]["r"],
+                         interface_cfg["base_text_color"]["g"],
+                         interface_cfg["base_text_color"]["b"])
+    pos = pygame.Vector2(120, 100)
+    create_text(world, "GAME OVER", 8, color, pos, TextAlignment.CENTER)

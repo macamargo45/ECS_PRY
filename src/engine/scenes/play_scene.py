@@ -10,13 +10,14 @@ from src.ecs.systems.s_collision_enemy_bullet import system_collision_enemy_bull
 from src.ecs.systems.s_explosion_kill import system_explosion_kill
 from src.ecs.systems.s_manager_level import system_level_manager
 from src.ecs.systems.s_movement import system_movement
+from src.ecs.systems.s_player_state import system_player_state
 from src.ecs.systems.s_screen_player import system_screen_player
 from src.ecs.systems.s_start_movement import system_start_movement
 from src.ecs.systems.s_enemy_movement import system_enemy_movement
 from src.ecs.systems.s_enemy_state import system_enemy_state
 from src.create.prefab_creator import create_input_player, create_starfield
 from src.create.prefab_creator_play import create_army, create_player, create_player_bullet, create_ready_text
-from src.create.prefab_interface_creator import create_paused_text, create_menu
+from src.create.prefab_creator_interface import create_paused_text, create_menu
 from src.engine.scenes.base_scene import Scene
 from src.engine.service_locator import ServiceLocator
 
@@ -27,7 +28,7 @@ class PlayScene(Scene):
 
         create_starfield(
             self.ecs_world, self._game_engine.starfield_cfg, self.screen_rect)
-        self.pl_entity, self.pl_tr, self.pl_v, self.pl_tg, self.pl_cs = create_player(
+        self.pl_entity, self.pl_tr, self.pl_v, self.pl_tg, self.pl_cs, self.pl_s = create_player(
             self.ecs_world)
         self.bullet = create_player_bullet(
             self.ecs_world, self.pl_tr.pos, self.pl_cs.area.size, self.pl_entity)
@@ -36,7 +37,7 @@ class PlayScene(Scene):
         ready_text_ent = create_ready_text(self.ecs_world)
 
         c_level = self.ecs_world.create_entity()
-        self.c_manager_level = CManagerLevel(ready_text_ent)
+        self.c_manager_level = CManagerLevel(ready_text_ent, self.bullet)
         self.ecs_world.add_component(c_level, self.c_manager_level)
 
         self.level_cfg = ServiceLocator.configs_service.get(
@@ -51,7 +52,7 @@ class PlayScene(Scene):
         if self.c_manager_level.state != LevelState.PAUSED:
             system_movement(self.ecs_world, delta_time)
             system_enemy_movement(self.ecs_world, delta_time)
-            system_enemy_state(self.ecs_world)
+            system_enemy_state(self.ecs_world, self.c_manager_level, self.pl_tr, self.pl_s, delta_time)
             system_animation(self.ecs_world, delta_time)
             system_bullet(self.ecs_world, self.pl_entity, self.screen_rect)
             system_bullet_in_ship(self.ecs_world)
@@ -59,6 +60,7 @@ class PlayScene(Scene):
             system_explosion_kill(self.ecs_world)
 
         system_blink(self.ecs_world, delta_time)
+        system_player_state(self.ecs_world, self.c_manager_level, delta_time)
         system_screen_player(self.ecs_world, self.screen_rect)
         system_level_manager(self.ecs_world, self.c_manager_level, delta_time)
 

@@ -3,9 +3,10 @@ import esper
 from src.create.prefab_creator import TextAlignment, create_sprite, create_square, create_text
 from src.ecs.components.c_animation import CAnimation
 from src.ecs.components.c_bullet_in_ship import CBulletInShip
-from src.ecs.components.c_bullet_state import CBulletState
+from src.ecs.components.c_bullet_state import BulletStates, CBulletState
 from src.ecs.components.c_enemy_fly import CEnemyFly
 from src.ecs.components.c_enemy_state import CEnemyState
+from src.ecs.components.c_follow_entity import CFollowEntity
 from src.ecs.components.c_player_state import CPlayerState
 from src.ecs.components.c_surface import CSurface
 from src.ecs.components.c_transform import CTransform
@@ -34,7 +35,7 @@ def create_player(world: esper.World):
     player_tag = world.component_for_entity(player_entity, CTagPlayer)
     player_state = world.component_for_entity(player_entity, CPlayerState)
     player_surface = world.component_for_entity(player_entity, CSurface)
-    return (player_entity, player_tr, player_v, player_tag, player_surface)
+    return (player_entity, player_tr, player_v, player_tag, player_surface, player_state)
 
 
 def create_player_bullet(world: esper.World, player_pos: pygame.Vector2, player_size: pygame.Vector2, player_entity: int) -> CBulletState:
@@ -56,7 +57,7 @@ def create_player_bullet(world: esper.World, player_pos: pygame.Vector2, player_
     world.add_component(bullet_entity, CTransform(pygame.Vector2()))
     world.add_component(bullet_entity, CBulletInShip(player_entity))
 
-    bullet_state = CBulletState(val_bullet)
+    bullet_state = CBulletState(val_bullet, "player")
     world.add_component(bullet_entity, bullet_state)
     return bullet_state
 
@@ -120,10 +121,33 @@ def create_army(world: esper.World):
                                      start_pos.y + space_ships * row)
                 create_enemy(world, pos, global_speed, score_value,
                              score_value_attack, image, animations)
-                
-def create_ready_text(world:esper.World) -> int:
-    interface_cfg = ServiceLocator.configs_service.get("assets/cfg/interface.json")
-    color = pygame.Color(interface_cfg["ready_text_color"]["r"],interface_cfg["ready_text_color"]["g"],interface_cfg["ready_text_color"]["b"])
+
+
+def create_ready_text(world: esper.World) -> int:
+    interface_cfg = ServiceLocator.configs_service.get(
+        "assets/cfg/interface.json")
+    color = pygame.Color(interface_cfg["ready_text_color"]["r"],
+                         interface_cfg["ready_text_color"]["g"], interface_cfg["ready_text_color"]["b"])
     pos = pygame.Vector2(128, 144)
-    game_start = create_text(world, "READY", 8, color, pos, TextAlignment.CENTER)
-    return game_start 
+    game_start = create_text(world, "READY", 8, color,
+                             pos, TextAlignment.CENTER)
+    return game_start
+
+
+def create_enemy_bullet(world: esper.World, pos: pygame.Vector2, vel_x: float):
+    bullet_cfg = ServiceLocator.configs_service.get("assets/cfg/bullet.json")
+    enemy_bullet_cfg = bullet_cfg["enemy"]
+    size = pygame.Vector2(enemy_bullet_cfg["size"]["w"],
+                          enemy_bullet_cfg["size"]["h"])
+    vel = pygame.Vector2(0, 0)
+    color = pygame.Color(enemy_bullet_cfg["color"]["r"],
+                         enemy_bullet_cfg["color"]["g"],
+                         enemy_bullet_cfg["color"]["b"])
+    enemy_bullet_entity = create_square(world, size, pos, vel, color)
+    speed = pygame.Vector2(enemy_bullet_cfg["velocity"]["x"] + vel_x,
+                           enemy_bullet_cfg["velocity"]["y"])
+    c_bullet_state = CBulletState(speed, "enemy")
+    c_bullet_state.state = BulletStates.FIRED
+    world.add_component(enemy_bullet_entity,
+                        c_bullet_state)
+    return c_bullet_state

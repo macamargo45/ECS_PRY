@@ -1,7 +1,6 @@
 from enum import Enum
 
-from src.ecs.components.c_surface import CSurface
-from src.ecs.components.c_blink import CBlink
+from src.ecs.components.c_bullet_state import CBulletState
 
 
 class LevelState(Enum):
@@ -12,7 +11,7 @@ class LevelState(Enum):
 
 
 class CManagerLevel:
-    def __init__(self, ready_text_entity: int):
+    def __init__(self, ready_text_entity: int, bullet_state: CBulletState):
         self.state: LevelState = LevelState.START
 
         self.time_on_state = 0
@@ -25,3 +24,5 @@ class CManagerLevel:
         self.win_text_ent_2 = -1
 
         self.ready_text_entity = ready_text_entity
+
+        self.bullet_state = bullet_state
