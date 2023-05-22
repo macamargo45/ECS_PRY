@@ -59,11 +59,12 @@ class GameEngine:
         
         self._scenes:dict[str, Scene] = {}
         self._scenes["MENU_SCENE"] = MenuScene(self)
-        self._scenes["LEVEL_01"] = PlayScene(self)
+        self._scenes["NEXT_LEVEL"] = PlayScene(self)
         self._scenes["WIN_SCENE"] = WinScene(self)
         self._scenes["GAME_OVER_SCENE"] = GameoverScene(self)
         self._current_scene:Scene = None
         self._scene_name_to_switch:str = None
+        self._current_level = 1
 
     def _load_config_files(self):
         with open("assets/cfg/window.json", encoding="utf-8") as window_file:

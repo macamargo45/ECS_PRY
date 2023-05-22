@@ -8,7 +8,8 @@ class LevelState(Enum):
     START = 0
     PLAY = 1
     PAUSED = 2
-    GAME_OVER = 3
+    NEXT_LEVEL = 3
+    GAME_OVER = 4
 
 
 class CManagerLevel:

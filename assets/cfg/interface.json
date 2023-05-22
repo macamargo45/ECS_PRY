@@ -122,5 +122,17 @@
             "x": 153,
             "y": 25
         }
+    },
+    "level_info":{
+        "image": "assets/img/invaders_level_flag.png",
+        "pos":{
+            "x": 190,
+            "y": 21
+        },
+        "color":{
+            "r": 255,
+            "g": 255,
+            "b": 255
+        }
     }
 }

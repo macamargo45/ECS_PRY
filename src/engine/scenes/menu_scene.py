@@ -72,4 +72,4 @@ class MenuScene(Scene):
 
     def do_action(self, action: CInputCommand):
         if action.name == "START_GAME":
-            self.switch_scene("LEVEL_01")
+            self.switch_scene("NEXT_LEVEL")

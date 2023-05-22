@@ -1,4 +1,6 @@
 import json
+from src.ecs.systems.s_enemies_terminated import system_enemies_terminated
+from src.create.prefab_creator import create_level_flag
 from src.create.prefab_creator import create_lifes_indicator_squares
 from src.ecs.systems.s_player_state import system_player_state
 from src.create.prefab_interface_creator import create_gameover_text
@@ -51,6 +53,7 @@ class PlayScene(Scene):
 
         create_menu(self.ecs_world, False)
         create_lifes_indicator_squares(self.ecs_world, self._game_engine.interface_cfg, self._game_engine.player_cfg)
+        create_level_flag(self.ecs_world, self._game_engine.interface_cfg, self._game_engine._current_level)
 
     def do_update(self, delta_time: float):
         system_start_movement(self.ecs_world, delta_time, self.screen_rect.h)
@@ -66,10 +69,11 @@ class PlayScene(Scene):
             system_explosion_kill(self.ecs_world)
             system_enemy_bullet(self.ecs_world, self.pl_entity, self._game_engine.enemybullet_cfg)
             system_collision_player_enemybullet(self.ecs_world, self.do_action)
-
+            system_enemies_terminated(self.ecs_world, self.c_manager_level)
+            
         system_blink(self.ecs_world, delta_time)
         system_screen_player(self.ecs_world, self.screen_rect)
-        system_level_manager(self.ecs_world, self.c_manager_level, delta_time)
+        system_level_manager(self.ecs_world, self.c_manager_level, self.do_action, delta_time)
 
     def do_action(self, action: CInputCommand) -> None:
         if action.name == "PLAYER_LEFT":
@@ -100,7 +104,9 @@ class PlayScene(Scene):
                     self.level_cfg["pause_game_sound"])
 
         if action.name == "GAME_OVER":
-            print("TERMINADO")
             create_gameover_text(self.ecs_world)
             ServiceLocator.sounds_service.play("assets/snd/game_over.ogg")
 
+        if action.name == "NEXT_LEVEL":
+            self._game_engine._current_level += 1
+            self.switch_scene("NEXT_LEVEL")

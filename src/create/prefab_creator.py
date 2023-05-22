@@ -104,10 +104,24 @@ def create_lifes_indicator_squares(world: esper.World, interface_info: dict, pla
         size = player_sprite.get_size()
         pos = pygame.Vector2(interface_info["lives"]["pos"]["x"],
                             interface_info["lives"]["pos"]["y"])
-        pos.x = pos.x + ((size[0] + 2) * i)
+        pos.x = pos.x + ((size[0] + 1) * i)
         vel = pygame.Vector2(0, 0)
-        indicator_entity = create_sprite(world, pos, vel, player_sprite.copy())
+        indicator_entity = create_sprite(world, pos, vel, player_sprite)
         world.add_component(indicator_entity, CTagLiveIndicator(i))
+
+def create_level_flag(world: esper.World, interface_info: dict, current_level: int):
+    flag_sprite = ServiceLocator.images_service.get(interface_info["level_info"]["image"])
+    size = flag_sprite.get_size()
+    pos = pygame.Vector2(interface_info["level_info"]["pos"]["x"],
+                        interface_info["level_info"]["pos"]["y"])
+    vel = pygame.Vector2(0, 0)
+    indicator_entity = create_sprite(world, pos, vel, flag_sprite)
+    title_text_color = pygame.color.Color(interface_info["level_info"]["color"]["r"],
+                                        interface_info["level_info"]["color"]["g"],
+                                        interface_info["level_info"]["color"]["b"])
+    current_level = create_text(world, str(current_level).rjust(2,'0'), 8, title_text_color,
+                             pygame.Vector2(interface_info["level_info"]["pos"]["x"] + 12, interface_info["level_info"]["pos"]["y"] + 8), TextAlignment.LEFT)
+
 
 
 def create_enemy_spawner(world: esper.World, level_data: dict):
