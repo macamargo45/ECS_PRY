@@ -22,6 +22,6 @@ def system_collision_enemy_bullet(world: esper.World):
             bull_rect.topleft = c_b_t.pos
             if ene_rect.colliderect(bull_rect):
                 world.delete_entity(enemy_entity)
-                create_explosion(world, c_t.pos)
+                create_explosion(world, c_t.pos,"enemy")
                 c_b_st.state = BulletStates.IDLE
 

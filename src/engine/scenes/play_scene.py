@@ -57,13 +57,14 @@ class PlayScene(Scene):
             system_movement(self.ecs_world, delta_time)
             system_enemy_movement(self.ecs_world, delta_time)
             system_enemy_state(self.ecs_world)
-            system_animation(self.ecs_world, delta_time)
             system_bullet(self.ecs_world, self.pl_entity, self.screen_rect)
             system_bullet_in_ship(self.ecs_world)
             system_collision_enemy_bullet(self.ecs_world)
             system_explosion_kill(self.ecs_world)
             system_enemy_bullet(self.ecs_world, self.pl_entity, self._game_engine.enemybullet_cfg)
             system_collision_player_enemybullet(self.ecs_world, self.do_action)
+            system_animation(self.ecs_world, delta_time)
+
 
         system_blink(self.ecs_world, delta_time)
         system_screen_player(self.ecs_world, self.screen_rect)
@@ -81,7 +82,7 @@ class PlayScene(Scene):
             else:
                 self.pl_v.vel.x -= self.pl_tg.input_speed
 
-        if action.name == "PLAYER_FIRE":
+        if action.name == "PLAYER_FIRE" and action.phase == CommandPhase.START:
             self.bullet.state = BulletStates.FIRED
 
         if action.name == "PAUSE_GAME" and action.phase == CommandPhase.END:

@@ -29,7 +29,7 @@ def system_collision_player_enemybullet(world: esper.World, do_action: Callable[
                 bull_rect.topleft = c_b_t.pos
                 if player_rect.colliderect(bull_rect):
                     world.delete_entity(bullet_entity)
-                    create_explosion(world, p_t.pos)
+                    create_explosion(world, p_t.pos,"player")
                     ServiceLocator.sounds_service.play("assets/snd/player_die.ogg")
 
                     p_st.lives -= 1
