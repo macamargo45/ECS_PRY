@@ -29,6 +29,7 @@ def create_paused_text(world: esper.World) -> Tuple[CSurface, CBlink, int]:
     paused_blk.enabled = False
     return paused_s, paused_blk, paused_com
 
+
 def create_gameover_text(world: esper.World):
     interface_cfg = ServiceLocator.configs_service.get(
         "assets/cfg/interface.json")
@@ -40,7 +41,6 @@ def create_gameover_text(world: esper.World):
                              TextAlignment.CENTER)
 
     world.component_for_entity(paused_com, CSurface)
-    
 
 
 def create_menu(world: esper.World, use_v_card: bool) -> None:
@@ -73,7 +73,8 @@ def create_menu(world: esper.World, use_v_card: bool) -> None:
     hiscore_text = create_text(world, "HI-SCORE", 8, title_text_color,
                                pygame.Vector2(90, 18), TextAlignment.LEFT)
 
-    max_score_text = create_text(world, high_score_max_value, 8, high_score_color,pygame.Vector2(148, 28), TextAlignment.RIGHT)
+    max_score_text = create_text(world, high_score_max_value, 8,
+                                 high_score_color, pygame.Vector2(148, 28), TextAlignment.RIGHT)
 
     world.add_component(max_score_text, CTagScore(True))
     world.add_component(max_score_text, CTagUpdateText())

@@ -70,6 +70,8 @@ class PlayScene(Scene):
             system_enemy_bullet(self.ecs_world, self.pl_entity, self._game_engine.enemybullet_cfg)
             system_collision_player_enemybullet(self.ecs_world, self.do_action)
             system_enemies_terminated(self.ecs_world, self.c_manager_level)
+            system_update_interface(self.ecs_world)
+            system_animation(self.ecs_world, delta_time)
             
         system_blink(self.ecs_world, delta_time)
         system_screen_player(self.ecs_world, self.screen_rect)

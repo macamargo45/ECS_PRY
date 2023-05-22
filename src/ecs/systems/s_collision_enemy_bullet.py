@@ -13,7 +13,8 @@ from src.engine.service_locator import ServiceLocator
 
 def system_collision_enemy_bullet(world: esper.World):
     components_enemy = world.get_components(CSurface, CTransform, CTagEnemy)
-    components_bullet = world.get_components(CSurface, CTransform, CBulletState)
+    components_bullet = world.get_components(
+        CSurface, CTransform, CBulletState)
 
     for enemy_entity, (c_s, c_t, c_ene_tag) in components_enemy:
         ene_rect = c_s.area.copy()
@@ -24,6 +25,5 @@ def system_collision_enemy_bullet(world: esper.World):
             if ene_rect.colliderect(bull_rect):
                 world.delete_entity(enemy_entity)
                 ServiceLocator.general_service.score += c_ene_tag.score_value
-                create_explosion(world, c_t.pos,"enemy")
+                create_explosion(world, c_t.pos, "enemy")
                 c_b_st.state = BulletStates.IDLE
-
