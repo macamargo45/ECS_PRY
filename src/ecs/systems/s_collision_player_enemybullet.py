@@ -1,6 +1,7 @@
 
 
 from typing import Callable
+from src.ecs.components.tags.c_tag_live_indicator import CTagLiveIndicator
 from src.engine.service_locator import ServiceLocator
 from src.ecs.components.c_player_state import PlayerState
 from src.ecs.components.c_input_command import CInputCommand
@@ -33,8 +34,12 @@ def system_collision_player_enemybullet(world: esper.World, do_action: Callable[
                     ServiceLocator.sounds_service.play("assets/snd/player_die.ogg")
 
                     p_st.lives -= 1
-                    if p_st.lives >= 0:
+                    if p_st.lives > 0:
                         p_st.state = PlayerState.IDLE
+                        indicadores = world.get_components(CSurface, CTagLiveIndicator)
+                        for _, (i_s, i_t) in indicadores:
+                            if i_t.index >= p_st.lives - 1:
+                                i_s.visible = False
                     else:
                         p_st.state = PlayerState.DEAD
                         c_input = CInputCommand("GAME_OVER",None)

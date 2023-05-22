@@ -115,5 +115,12 @@
     "vertical_card": {
         "v_speed": -50,
         "v_offset": 240
+    },
+    "lives":{
+        "image": "assets/img/invaders_life.png",
+        "pos":{
+            "x": 153,
+            "y": 25
+        }
     }
 }

@@ -1,5 +1,6 @@
 from enum import Enum
 import random
+from src.ecs.components.tags.c_tag_live_indicator import CTagLiveIndicator
 from src.ecs.components.tags.c_tag_enemybullet import CTagEnemyBullet
 import pygame
 import esper
@@ -90,6 +91,23 @@ def create_player_square(world: esper.World, player_info: dict, player_lvl_info:
                         CAnimation(player_info["animations"]))
     world.add_component(player_entity, CPlayerState())
     return player_entity
+
+
+def create_enemy_spawner(world: esper.World, level_data: dict):
+    spawner_entity = world.create_entity()
+    world.add_component(spawner_entity,
+                        CEnemySpawner(level_data["enemy_spawn_events"]))
+
+def create_lifes_indicator_squares(world: esper.World, interface_info: dict, player_info: dict):
+    for i in range(player_info["lives"] - 1):
+        player_sprite = ServiceLocator.images_service.get(interface_info["lives"]["image"])
+        size = player_sprite.get_size()
+        pos = pygame.Vector2(interface_info["lives"]["pos"]["x"],
+                            interface_info["lives"]["pos"]["y"])
+        pos.x = pos.x + ((size[0] + 2) * i)
+        vel = pygame.Vector2(0, 0)
+        indicator_entity = create_sprite(world, pos, vel, player_sprite.copy())
+        world.add_component(indicator_entity, CTagLiveIndicator(i))
 
 
 def create_enemy_spawner(world: esper.World, level_data: dict):

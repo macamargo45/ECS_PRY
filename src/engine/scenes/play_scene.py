@@ -1,4 +1,5 @@
 import json
+from src.create.prefab_creator import create_lifes_indicator_squares
 from src.ecs.systems.s_player_state import system_player_state
 from src.create.prefab_interface_creator import create_gameover_text
 from src.ecs.systems.s_collision_player_enemybullet import system_collision_player_enemybullet
@@ -49,6 +50,7 @@ class PlayScene(Scene):
         ServiceLocator.sounds_service.play(self.level_cfg["ready_game_sound"])
 
         create_menu(self.ecs_world, False)
+        create_lifes_indicator_squares(self.ecs_world, self._game_engine.interface_cfg, self._game_engine.player_cfg)
 
     def do_update(self, delta_time: float):
         system_start_movement(self.ecs_world, delta_time, self.screen_rect.h)
